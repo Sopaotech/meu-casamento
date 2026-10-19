@@ -1,0 +1,4 @@
+# Prisma checks migration bytes; do not rewrite line endings on checkout.
+prisma/migrations/**/migration.sql -text
+# Preserve the final blank line in this historical migration.
+prisma/migrations/20261018000000_initial/migration.sql whitespace=-blank-at-eof

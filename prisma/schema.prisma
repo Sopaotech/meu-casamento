@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime  @default(now())
+  sessions     Session[]
+  weddings     Wedding[] @relation("WeddingOwner")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+// A database-backed fixed-window counter, shared by all app instances.
+model AuthAttempt {
+  key      String   @id
+  attempts Int      @default(0)
+  resetAt  DateTime
+
+  @@index([resetAt])
+}
+
+model Wedding {
+  id                  String        @id @default(cuid())
+  ownerId             String
+  slug                String        @unique
+  draft               Json
+  draftVersion        Int           @default(1)
+  publishedRevisionId String?       @unique
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  owner               User          @relation("WeddingOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  revisions           Publication[] @relation("WeddingPublications")
+  photos              Photo[]
+  publishedRevision   Publication?  @relation("ActivePublication", fields: [publishedRevisionId, id], references: [id, weddingId], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([publishedRevisionId, id])
+  @@index([ownerId])
+}
+
+model Photo {
+  id        String   @id
+  weddingId String
+  mimeType  String
+  // Legacy bytes are retained only until safely copied to private storage.
+  bytes     Bytes?
+  storageKey String? @unique
+  sizeBytes Int?
+  createdAt DateTime @default(now())
+  wedding   Wedding  @relation(fields: [weddingId], references: [id], onDelete: Restrict)
+
+  @@index([weddingId])
+}
+
+model Publication {
+  id           String   @id @default(cuid())
+  weddingId    String
+  content      Json
+  createdAt    DateTime @default(now())
+  wedding      Wedding  @relation("WeddingPublications", fields: [weddingId], references: [id], onDelete: Restrict)
+  publishedFor Wedding? @relation("ActivePublication")
+
+  @@unique([id, weddingId])
+  @@index([weddingId, createdAt])
+}
