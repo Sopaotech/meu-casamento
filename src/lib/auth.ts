@@ -2,19 +2,22 @@ import { createHash, randomBytes } from "node:crypto";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "./db";
+import { assertHomologationPerimeter } from "./security";
+import { homologationAllowsOwner } from "./homologation";
 
 const SESSION_COOKIE = process.env.NODE_ENV === "production" ? "__Host-wedding-session" : "wedding-session";
 const SESSION_TTL_SECONDS = 60 * 60 * 24 * 7;
 const hashToken = (token: string) => createHash("sha256").update(token).digest("hex");
 
 export async function getUser(): Promise<{ id: string; email: string; name: string } | null> {
+  await assertHomologationPerimeter();
   const token = (await cookies()).get(SESSION_COOKIE)?.value;
   if (!token || !/^[a-f0-9]{64}$/.test(token)) return null;
   const session = await prisma.session.findUnique({
     where: { tokenHash: hashToken(token) },
     select: { expiresAt: true, user: { select: { id: true, email: true, name: true } } },
   });
-  return session && session.expiresAt > new Date() ? session.user : null;
+  return session && session.expiresAt > new Date() && homologationAllowsOwner(session.user.id) ? session.user : null;
 }
 
 export async function requireUser() {

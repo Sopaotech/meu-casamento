@@ -49,6 +49,9 @@ model Wedding {
   owner               User          @relation("WeddingOwner", fields: [ownerId], references: [id], onDelete: Restrict)
   revisions           Publication[] @relation("WeddingPublications")
   photos              Photo[]
+  giftItems           GiftItem[]
+  giftImages          GiftImage[]
+  giftAudits          GiftAudit[]
   publishedRevision   Publication?  @relation("ActivePublication", fields: [publishedRevisionId, id], references: [id, weddingId], onDelete: NoAction, onUpdate: NoAction)
 
   @@unique([publishedRevisionId, id])
@@ -73,10 +76,59 @@ model Publication {
   id           String   @id @default(cuid())
   weddingId    String
   content      Json
+  // Immutable gift snapshot; null for publications created before C-009A.
+  gifts        Json?
   createdAt    DateTime @default(now())
   wedding      Wedding  @relation("WeddingPublications", fields: [weddingId], references: [id], onDelete: Restrict)
   publishedFor Wedding? @relation("ActivePublication")
 
   @@unique([id, weddingId])
   @@index([weddingId, createdAt])
+}
+
+model GiftImage {
+  id         String     @id
+  weddingId  String
+  mimeType   String
+  storageKey String     @unique
+  sizeBytes  Int
+  createdAt  DateTime   @default(now())
+  wedding    Wedding    @relation(fields: [weddingId], references: [id], onDelete: Restrict)
+  gifts      GiftItem[]
+
+  @@unique([id, weddingId])
+  @@index([weddingId])
+}
+
+model GiftItem {
+  id          String      @id @default(cuid())
+  weddingId   String
+  name        String
+  description String
+  valueCents  Int?
+  imageId     String?
+  position    Int         @default(0)
+  active      Boolean     @default(true)
+  archivedAt  DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  wedding     Wedding     @relation(fields: [weddingId], references: [id], onDelete: Restrict)
+  image       GiftImage?  @relation(fields: [imageId, weddingId], references: [id, weddingId], onDelete: NoAction, onUpdate: NoAction)
+  audits      GiftAudit[]
+
+  @@unique([id, weddingId])
+  @@index([weddingId, archivedAt, position])
+}
+
+model GiftAudit {
+  id        String   @id @default(cuid())
+  giftId    String
+  weddingId String
+  action    String
+  snapshot  Json
+  createdAt DateTime @default(now())
+  wedding   Wedding  @relation(fields: [weddingId], references: [id], onDelete: Restrict)
+  gift      GiftItem @relation(fields: [giftId, weddingId], references: [id, weddingId], onDelete: Restrict)
+
+  @@index([weddingId, giftId, createdAt])
 }

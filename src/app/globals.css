@@ -97,36 +97,105 @@ input::placeholder, textarea::placeholder { color: #858b80; }
 .editor-photo img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; }
 .editor-photo .button { width: 100%; }
 
-/* The same structured presentation is used by private preview and publication. */
-.wedding-page { min-height: 100vh; padding: clamp(1rem, 5vw, 4rem); background: #f4f0e8; color: #51493f; text-align: center; overflow-wrap: anywhere; }
-.wedding-frame { max-width: 950px; min-height: calc(100vh - clamp(2rem, 10vw, 8rem)); margin: auto; padding: clamp(3.5rem, 8vw, 7rem) clamp(1.4rem, 6vw, 5rem); border: 1px solid #cfc2ae; background: #fcfaf5; }
-.wedding-page h1 { margin: 1rem 0; font: 400 clamp(3.1rem, 8vw, 6.4rem)/1.02 var(--serif); letter-spacing: -.055em; }
-.wedding-kicker, .wedding-details span { display: block; color: #98846a; font-family: var(--sans); font-size: .64rem; font-weight: 700; letter-spacing: .19em; }
-.wedding-ornament { margin: 2.5rem 0 .5rem; color: #b09676; font-size: 1.5rem; }
-.wedding-divider { width: 42px; height: 1px; margin: 2rem auto; background: currentColor; opacity: .4; }
-.wedding-welcome { max-width: 560px; margin: 0 auto; font: italic clamp(1.1rem, 2.4vw, 1.4rem)/1.7 var(--serif); white-space: pre-wrap; }
-.wedding-details { display: flex; flex-wrap: wrap; justify-content: center; gap: 2.5rem 5rem; margin: 4.5rem auto 0; }
-.wedding-details p { max-width: 320px; margin: 0; }
-.wedding-details span { margin-bottom: .8rem; }
-.wedding-details time { display: block; }
-.wedding-story { max-width: 560px; margin: 5rem auto 0; }
-.wedding-story h2 { margin: 1rem 0 1.4rem; font: 400 clamp(2rem, 4vw, 2.8rem) var(--serif); }
-.wedding-story > p:last-child { line-height: 1.9; white-space: pre-wrap; }
-.wedding-gallery { margin: 5rem auto 0; }
-.wedding-gallery h2 { margin: 1rem 0 1.5rem; font: 400 clamp(2rem, 4vw, 2.8rem) var(--serif); }
-.wedding-gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr)); gap: 1rem; }
-.wedding-gallery-grid img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; }
-.wedding-end { margin: 4.5rem 0 0; color: #b09676; }
-.wedding-page--moderno { background: #e8eae4; color: #26372f; }
-.wedding-page--moderno .wedding-frame { border: 0; background: #f8faf6; }
-.wedding-page--moderno h1 { font-family: var(--sans); font-weight: 700; letter-spacing: -.07em; text-transform: uppercase; }
-.wedding-page--moderno .wedding-kicker, .wedding-page--moderno .wedding-details span { color: #658073; }
-.wedding-page--moderno .wedding-ornament, .wedding-page--moderno .wedding-end { color: #658073; }
-.wedding-page--romantico { background: #f0e5e1; color: #704b4b; }
-.wedding-page--romantico .wedding-frame { border: 1px solid #d9bdb8; border-radius: 48% 48% 0 0 / 19% 19% 0 0; background: #fff9f6; }
+/* Shared markup for preview and publication; each theme owns its presentation. */
+.wedding-page { --wedding-accent: #715c43; --wedding-line: #d8cbb8; min-height: 100vh; background: #f3eee5; color: #3f3932; overflow-wrap: anywhere; }
+.wedding-frame { max-width: 1440px; margin-inline: auto; background: #fbf8f1; }
+.wedding-hero { display: grid; gap: 2rem; padding: 3rem 1.25rem 1.25rem; text-align: center; }
+.wedding-hero-copy { min-width: 0; align-self: center; }
+.wedding-kicker, .wedding-details-list span { display: block; margin: 0; color: var(--wedding-accent); font: 700 .67rem/1.5 var(--sans); letter-spacing: .16em; }
+.wedding-ornament { display: block; margin: 1.3rem 0 .5rem; color: var(--wedding-accent); font-size: 1.25rem; }
+.wedding-page h1 { margin: 0; font: 400 clamp(2.8rem, 10vw, 6.8rem)/1.04 var(--serif); letter-spacing: -.055em; }
+.wedding-divider { display: block; width: 3rem; height: 1px; margin: 1.7rem auto; background: var(--wedding-accent); }
+.wedding-hero-date { display: block; color: var(--wedding-accent); font: 400 1rem/1.5 var(--serif); letter-spacing: .03em; }
+.wedding-hero-portrait { position: relative; min-width: 0; aspect-ratio: 4 / 5; overflow: hidden; background: #e5dbcc; }
+.wedding-hero-portrait img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.wedding-hero-portrait--empty { display: grid; place-items: center; background: radial-gradient(ellipse at 50% 25%, #f8f1e5, transparent 65%), #e7dccb; }
+.wedding-hero-portrait--empty::after { content: ""; position: absolute; inset: 8%; border: 1px solid #b9a98f; }
+.wedding-empty-ornament { color: #806a4d; font-size: 2rem; }
+.wedding-welcome, .wedding-details, .wedding-story, .wedding-gallery { padding: 4.5rem 1.5rem; }
+.wedding-welcome { text-align: center; }
+.wedding-welcome-mark { color: var(--wedding-accent); font-size: 1.2rem; }
+.wedding-welcome p { max-width: 46rem; margin: 1.4rem auto 0; font: italic 400 clamp(1.25rem, 3vw, 1.8rem)/1.6 var(--serif); white-space: pre-wrap; }
+.wedding-section-heading h2 { margin: .8rem 0 0; font: 400 clamp(2.2rem, 5vw, 3.8rem)/1.1 var(--serif); letter-spacing: -.045em; }
+.wedding-details { border-block: 1px solid var(--wedding-line); text-align: center; }
+.wedding-details-list { display: grid; gap: 2rem; margin-top: 2.5rem; }
+.wedding-details-list p { min-width: 0; margin: 0; font: 400 1.25rem/1.5 var(--serif); }
+.wedding-details-list span { margin-bottom: .65rem; }
+.wedding-details-list time { display: block; }
+.wedding-story { text-align: center; }
+.wedding-story-copy { max-width: 43rem; margin: 2rem auto 0; line-height: 1.9; white-space: pre-wrap; }
+.wedding-gallery { padding-top: 2rem; text-align: center; }
+.wedding-gallery-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .6rem; margin-top: 2.5rem; }
+.wedding-gallery-grid img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; }
+.wedding-footer { padding: 3.5rem 1.5rem; border-top: 1px solid var(--wedding-line); color: var(--wedding-accent); text-align: center; }
+.wedding-footer-ornament { font-size: 1.2rem; }
+.wedding-footer p { margin: 1rem 0 .35rem; color: inherit; font: 400 1.7rem/1.2 var(--serif); }
+.wedding-footer time { font-size: .8rem; }
+
+/* Clássico: ivory paper, champagne rules and editorial symmetry. */
+.wedding-page--classico .wedding-hero { padding-bottom: 0; }
+.wedding-page--classico .wedding-hero-copy { padding: 1rem 1rem 2rem; }
+.wedding-page--classico .wedding-hero-portrait { margin-inline: .25rem; }
+.wedding-page--classico .wedding-details { background: #f3ece1; }
+.wedding-page--classico .wedding-gallery-grid img:first-child { grid-column: 1 / -1; aspect-ratio: 3 / 2; }
+
+/* Romântico: an arched portrait and quiet botanical details. */
+.wedding-page--romantico { --wedding-accent: #805357; --wedding-line: #dbc3be; background: #efe2dd; color: #4f3e3d; }
+.wedding-page--romantico .wedding-frame { background: #fcf7f1; }
+.wedding-page--romantico .wedding-hero { position: relative; gap: 2rem; padding-top: 2.5rem; }
+.wedding-page--romantico .wedding-hero-portrait { order: -1; width: min(100%, 420px); margin-inline: auto; border-radius: 50% 50% 2px 2px / 35% 35% 2px 2px; background-color: #dfcfca; }
+.wedding-page--romantico .wedding-hero-portrait--empty { background: radial-gradient(ellipse at 50% 25%, #f9eee9, transparent 65%), #dfcfca; }
+.wedding-page--romantico .wedding-hero-portrait--empty::after { border-radius: 50% 50% 0 0 / 35% 35% 0 0; border-color: #b99996; }
 .wedding-page--romantico h1 { font-style: italic; }
-.wedding-page--romantico .wedding-kicker, .wedding-page--romantico .wedding-details span { color: #a87476; }
-.wedding-page--romantico .wedding-ornament, .wedding-page--romantico .wedding-end { color: #c18e90; }
+.wedding-page--romantico .wedding-hero-copy { position: relative; padding: 1rem .5rem 2rem; }
+.wedding-page--romantico .wedding-hero-copy::after { content: ""; display: block; width: 5rem; height: 2.5rem; margin: 2rem auto 0; border-bottom: 1px solid #758b74; border-radius: 0 0 50% 50%; transform: rotate(-8deg); }
+.wedding-page--romantico .wedding-welcome { background: #f3e9e3; }
+.wedding-page--romantico .wedding-details { border: 0; background: #e7ede3; }
+.wedding-page--romantico .wedding-details .wedding-kicker, .wedding-page--romantico .wedding-details-list span { color: #52664c; }
+.wedding-page--romantico .wedding-gallery-grid img:nth-child(odd) { border-radius: 48% 48% 0 0 / 30% 30% 0 0; }
+
+/* Moderno: strong contrast and an asymmetric, image-led composition. */
+.wedding-page--moderno { --wedding-accent: #4b4a47; --wedding-line: #d0cfca; background: #e6e4df; color: #1b1b1a; }
+.wedding-page--moderno .wedding-frame { background: #f8f7f2; }
+.wedding-page--moderno .wedding-hero { gap: 0; padding: 0; text-align: left; }
+.wedding-page--moderno .wedding-hero-copy { padding: 4rem 1.5rem; }
+.wedding-page--moderno .wedding-ornament { margin: 2rem 0 1rem; }
+.wedding-page--moderno h1 { font-family: var(--sans); font-size: clamp(2.8rem, 10vw, 7rem); font-weight: 700; letter-spacing: -.07em; text-transform: uppercase; }
+.wedding-page--moderno .wedding-divider { width: 4rem; height: 2px; margin: 2rem 0; }
+.wedding-page--moderno .wedding-hero-date { font-family: var(--sans); font-size: .9rem; font-weight: 700; text-transform: uppercase; }
+.wedding-page--moderno .wedding-hero-portrait--empty { background: linear-gradient(145deg, #e7e5df, #c7c5bd); }
+.wedding-page--moderno .wedding-hero-portrait--empty::after { inset: 12% 18%; border-color: #86847e; transform: rotate(-6deg); }
+.wedding-page--moderno .wedding-empty-ornament { color: #4b4a47; }
+.wedding-page--moderno .wedding-welcome, .wedding-page--moderno .wedding-story, .wedding-page--moderno .wedding-gallery { text-align: left; }
+.wedding-page--moderno .wedding-welcome { background: #20201f; color: #fbfaf5; }
+.wedding-page--moderno .wedding-welcome-mark { color: #ddd8cc; }
+.wedding-page--moderno .wedding-welcome p { margin-left: 0; font-style: normal; }
+.wedding-page--moderno .wedding-section-heading h2 { font-family: var(--sans); font-weight: 700; letter-spacing: -.06em; }
+.wedding-page--moderno .wedding-details { text-align: left; }
+.wedding-page--moderno .wedding-story-copy { margin-left: 0; }
+.wedding-page--moderno .wedding-gallery-grid img:first-child { grid-column: 1 / -1; aspect-ratio: 3 / 2; }
+.wedding-page--moderno .wedding-footer { background: #20201f; color: #f8f7f2; }
+.wedding-page--moderno .wedding-footer p { font-family: var(--sans); font-weight: 700; }
+
+@media (min-width: 700px) {
+  .wedding-hero { padding: 5rem 5% 2rem; }
+  .wedding-welcome, .wedding-details, .wedding-story, .wedding-gallery { padding: 6.5rem 7%; }
+  .wedding-details-list { display: flex; justify-content: center; gap: 4rem; }
+  .wedding-details-list p { flex: 0 1 20rem; }
+  .wedding-gallery { padding-top: 4rem; }
+  .wedding-gallery-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+  .wedding-page--classico .wedding-hero-portrait { aspect-ratio: 16 / 8; }
+  .wedding-page--classico .wedding-gallery-grid img:first-child { grid-column: span 2; aspect-ratio: auto; height: 100%; }
+  .wedding-page--romantico .wedding-hero { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 7%; padding: 5rem 8%; }
+  .wedding-page--romantico .wedding-hero-portrait { width: 100%; }
+  .wedding-page--moderno .wedding-hero { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); }
+  .wedding-page--moderno .wedding-hero-copy { padding: 5rem 9%; }
+  .wedding-page--moderno .wedding-hero-portrait { min-height: 620px; height: 100%; aspect-ratio: auto; }
+  .wedding-page--moderno .wedding-details, .wedding-page--moderno .wedding-story { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 3rem; }
+  .wedding-page--moderno .wedding-details-list { justify-content: flex-start; flex-wrap: wrap; margin-top: 0; }
+  .wedding-page--moderno .wedding-story-copy { margin-top: 0; }
+  .wedding-page--moderno .wedding-gallery-grid img:first-child { grid-column: span 2; aspect-ratio: auto; height: 100%; }
+}
 
 @media (max-width: 760px) {
   .container, .narrow { width: min(100% - 2rem, 1240px); }
@@ -148,7 +217,6 @@ input::placeholder, textarea::placeholder { color: #858b80; }
   .site-nav { gap: .6rem; }
   .brand { font-size: 1.4rem; }
   .site-nav .button { padding-inline: .5rem; }
-  .wedding-frame { padding-inline: 1rem; }
 }
 
 /* Noivara home. The nv prefix keeps this presentation separate from the editor. */

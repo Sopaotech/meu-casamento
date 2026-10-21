@@ -3,7 +3,7 @@
 import { notFound, redirect } from 'next/navigation';
 import { requireUser } from '@/lib/auth';
 import { assertSameOrigin } from '@/lib/security';
-import { contentFromForm, initialContent, normalizeSlug, validateContent } from '@/lib/content';
+import { contentFromForm, coupleNamesFromForm, initialContent, normalizeSlug, validateContent } from '@/lib/content';
 import { createWedding, publishDraft, saveDraft, unpublish, WeddingError } from '@/lib/weddings';
 import { PhotoError, removePhoto, uploadPhoto } from '@/lib/photos';
 
@@ -38,7 +38,7 @@ export async function createWeddingAction(form: FormData) {
   await assertSameOrigin();
   const user = await requireUser();
   const slug = normalizeSlug(form.get('slug'));
-  const validated = validateContent({ ...initialContent, coupleNames: form.get('coupleNames') });
+  const validated = validateContent({ ...initialContent, coupleNames: coupleNamesFromForm(form) });
   if (!slug || !validated.ok) redirect('/painel/novo?estado=invalido');
   let id: string;
   try {

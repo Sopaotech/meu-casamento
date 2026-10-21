@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { WeddingPage } from '../src/components/wedding-page';
-import { contentFromForm, normalizeSlug, validateContent } from '../src/lib/content';
+import { contentFromForm, coupleNamesFromForm, normalizeSlug, validateContent } from '../src/lib/content';
 
 const valid = {
   template: 'classico',
@@ -16,6 +16,22 @@ const valid = {
 };
 
 describe('conteúdo do site', () => {
+  it('combina nomes do novo formulário e mantém compatibilidade com envios legados', () => {
+    const form = new FormData();
+    form.set('firstName', ' Ana ');
+    form.set('secondName', ' João ');
+    expect(coupleNamesFromForm(form)).toBe('Ana e João');
+    expect(validateContent({ ...valid, coupleNames: coupleNamesFromForm(form) }).ok).toBe(true);
+    form.set('secondName', '  ');
+    form.set('coupleNames', 'Valor legado não deve substituir campo incompleto');
+    expect(coupleNamesFromForm(form)).toBeNull();
+    form.delete('firstName');
+    form.delete('secondName');
+    form.set('coupleNames', 'Ana e João');
+    expect(coupleNamesFromForm(form)).toBe('Ana e João');
+    form.delete('coupleNames');
+    expect(coupleNamesFromForm(form)).toBeNull();
+  });
   it('aceita os três modelos e normaliza espaços dos campos', () => {
     for (const template of ['classico', 'moderno', 'romantico']) {
       expect(validateContent({ ...valid, template, coupleNames: '  Ana e João  ' }))
@@ -99,6 +115,33 @@ describe('renderização pública e prévia', () => {
     expect(html).toContain(`/fotos/${photoIds[1]}`);
     expect(html).toContain('Galeria de fotos');
   });
+
+  it.each(['classico', 'romantico', 'moderno'] as const)(
+    'apresenta a primeira foto no hero e preserva a galeria no modelo %s', (template) => {
+      const photoIds = ['a'.repeat(64), 'b'.repeat(64)];
+      const html = renderToStaticMarkup(createElement(WeddingPage, {
+        content: { ...valid, template, photoIds },
+      }));
+      expect(html).toContain(`wedding-page--${template}`);
+      expect(html).toMatch(new RegExp(`wedding-hero-portrait"><img src="/fotos/${photoIds[0]}"`));
+      expect(html).toContain(`Foto 2 de ${valid.coupleNames}`);
+      expect(html).toContain(`/fotos/${photoIds[1]}`);
+      expect(html).toContain('2028-02-29');
+    },
+  );
+
+  it.each(['classico', 'romantico', 'moderno'] as const)(
+    'não inventa fotos nem detalhes opcionais ausentes no modelo %s', (template) => {
+      const html = renderToStaticMarkup(createElement(WeddingPage, {
+        content: { ...valid, template, photoIds: [], eventDate: '', eventLocation: '', story: '', welcomeMessage: '' },
+      }));
+      expect(html).toContain('wedding-hero-portrait--empty');
+      expect(html).not.toContain('<img');
+      expect(html).not.toContain('Galeria de fotos');
+      expect(html).not.toContain('Detalhes da celebração');
+      expect(html).not.toContain('Um pouco sobre nós');
+    },
+  );
 });
 
 describe('endereço público', () => {

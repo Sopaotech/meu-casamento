@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({ requireUser: vi.fn(), ownedWedding: vi.fn(), notFound: vi.fn() }));
 vi.mock('@/lib/auth', () => ({ requireUser: mocks.requireUser }));
 vi.mock('@/lib/weddings', () => ({ ownedWedding: mocks.ownedWedding }));
+vi.mock('@/lib/gifts', () => ({ listOwnedGifts: vi.fn() }));
 vi.mock('next/navigation', () => ({ notFound: mocks.notFound }));
 import Preview from '../src/app/painel/[id]/previa/page';
 

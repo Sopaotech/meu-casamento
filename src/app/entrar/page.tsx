@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { login } from "./actions";
+import { homologationDeclared } from "@/lib/homologation";
 
 export const dynamic = "force-dynamic";
 
@@ -8,7 +9,7 @@ export default async function EntrarPage({ searchParams }: { searchParams: Promi
   return (
     <main className="narrow" style={{ paddingBlock: "3rem" }}>
       <div className="card stack">
-        <Link href="/" className="brand">Noivara</Link>
+        <Link href="/" className="brand">Meu Casamento</Link>
         <h1>Entrar</h1>
         <p>Acesse o painel do seu casamento.</p>
         {erro && <p role="alert" className="error">{erro === "limite" ? "Muitas tentativas. Aguarde 15 minutos e tente novamente." : "Não foi possível entrar. Confira seus dados e tente novamente."}</p>}
@@ -19,7 +20,7 @@ export default async function EntrarPage({ searchParams }: { searchParams: Promi
           <input id="password" name="password" type="password" autoComplete="current-password" required /></div>
           <button type="submit" className="button">Entrar</button>
         </form>
-        <p>Ainda não tem conta? <Link href="/cadastro">Criar conta</Link></p>
+        {!homologationDeclared() && <p>Ainda não tem conta? <Link href="/cadastro">Criar conta</Link></p>}
       </div>
     </main>
   );

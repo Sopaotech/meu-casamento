@@ -1,0 +1,53 @@
+.dashboard { padding-block: clamp(2.5rem, 6vw, 5rem) 6rem; }
+.header, .sectionHeading { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 1.25rem 2rem; }
+.header { padding-bottom: clamp(2.5rem, 6vw, 4rem); border-bottom: 1px solid var(--line); }
+.header h1, .newWedding h1 { margin: .35rem 0 .75rem; font: 400 clamp(2.5rem, 6vw, 4.5rem)/1.05 var(--serif); letter-spacing: -.04em; overflow-wrap: anywhere; }
+.header p:last-child, .sectionHeading p:last-child { margin-bottom: 0; color: var(--muted); }
+.eyebrow { margin: 0; color: #65735c; font-size: .68rem; font-weight: 700; letter-spacing: .16em; }
+.sectionHeading { margin: clamp(2.5rem, 5vw, 4rem) 0 2rem; }
+.sectionHeading h2 { margin: .35rem 0 .5rem; font: 400 clamp(2rem, 4vw, 3rem)/1.1 var(--serif); letter-spacing: -.035em; }
+.grid { display: grid; gap: 2rem; }
+.card { display: grid; min-width: 0; overflow: hidden; background: var(--white); border: 1px solid var(--line); box-shadow: 0 14px 45px #3446320d; }
+.cover { position: relative; min-height: 240px; aspect-ratio: 16 / 10; overflow: hidden; background: #e8e8dc; }
+.cover img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.coverEmpty { display: flex; height: 100%; min-height: inherit; flex-direction: column; align-items: center; justify-content: center; gap: .8rem; padding: 2rem; color: #53624d; text-align: center; background: radial-gradient(circle at 50% 40%, #f2f1e8, #dce5d9); }
+.coverEmpty span:first-child { font-size: 2.4rem; line-height: 1; }
+.coverEmpty span:last-child { font: italic 1.25rem var(--serif); }
+.status { position: absolute; top: 1rem; left: 1rem; padding: .45rem .8rem; background: #fffefa; color: #435940; font-size: .7rem; font-weight: 700; line-height: 1.2; }
+.draft { color: #6c5b48; }
+.published { color: #34523b; }
+.cardBody { min-width: 0; padding: clamp(1.5rem, 3vw, 2.5rem); }
+.template { margin: 0 0 .5rem; color: #65735c; font-size: .65rem; font-weight: 700; letter-spacing: .14em; }
+.cardBody h3 { margin: 0 0 .35rem; font: 400 clamp(2rem, 3vw, 2.8rem)/1.1 var(--serif); letter-spacing: -.03em; overflow-wrap: anywhere; }
+.intro { color: var(--muted); font-size: .9rem; }
+.facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin: 1.5rem 0; padding: 1.2rem 0; border-block: 1px solid var(--line); }
+.facts div { display: flex; flex-direction: column; gap: .2rem; min-width: 0; }
+.facts div + div { border-left: 1px solid var(--line); padding-left: 1rem; }
+.facts span { color: #65735c; font-size: .62rem; font-weight: 700; letter-spacing: .1em; }
+.facts strong { color: #334a38; font-size: .9rem; overflow-wrap: anywhere; }
+.facts small, .action small { color: #6e7468; font-size: .78rem; line-height: 1.4; }
+.publicationNote { margin: -.5rem 0 1rem; color: var(--muted); font-size: .78rem; line-height: 1.5; }
+.cardActions { display: grid; gap: .6rem; }
+.action { display: flex; align-items: center; gap: .9rem; min-height: 68px; padding: .8rem 1rem; border: 1px solid #e0e5d9; background: #f8faf4; color: #344c39; text-decoration: none; transition: background .18s, border-color .18s; }
+.action:hover { background: #eef3e9; border-color: #adbca8; }
+.action > span:first-child { display: grid; flex: 0 0 2.25rem; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 50%; background: #e8eee3; font-size: 1.1rem; }
+.action > span:nth-child(2) { display: flex; flex: 1; min-width: 0; flex-direction: column; }
+.action strong { font-size: .86rem; }
+.action b { font-weight: 400; }
+.previewLinks { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; margin-top: 1.25rem; }
+.previewLinks a, .back { color: var(--sage-dark); font-size: .83rem; font-weight: 700; text-underline-offset: 4px; }
+.previewLinks a { display: inline-flex; align-items: center; min-height: 44px; }
+.empty { padding: clamp(2.5rem, 8vw, 5rem) 1.5rem; border: 1px solid var(--line); background: var(--white); text-align: center; }
+.emptyOrnament { display: block; margin-bottom: 1rem; color: #8b9b80; font-size: 2rem; }
+.empty h3 { margin-bottom: .7rem; font: 400 2rem var(--serif); }
+.empty p { max-width: 28rem; margin: 0 auto 1.5rem; color: var(--muted); }
+.newWedding { padding-block: 3rem 6rem; }
+.newWedding h1 { font-size: clamp(2.5rem, 6vw, 3.75rem); }
+.newWedding > div > p:last-child, .newForm p { color: var(--muted); }
+.newForm { padding: clamp(1.5rem, 4vw, 2.5rem); }
+.newForm h2 { margin-bottom: .5rem; font: 400 1.8rem var(--serif); }
+.newForm p { margin-bottom: 0; font-size: .9rem; }
+.nameFields { display: grid; gap: 1rem; }
+@media (min-width: 600px) { .nameFields { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 800px) { .card { grid-template-columns: minmax(260px, .8fr) minmax(0, 1.2fr); } .cover { aspect-ratio: auto; } .cover img { position: absolute; inset: 0; } }
+@media (min-width: 1100px) { .cardActions { grid-template-columns: repeat(3, minmax(0, 1fr)); } .action { align-items: flex-start; flex-wrap: wrap; } .action > span:nth-child(2) { flex-basis: calc(100% - 4rem); } .action b { margin-left: auto; } }

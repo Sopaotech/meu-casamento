@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createSession, destroySession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { assertSameOrigin, consumeAuthAttempt, normalizeEmail, validPassword } from "@/lib/security";
+import { homologationAllowsOwner } from "@/lib/homologation";
 
 // A valid fixed bcrypt hash keeps the missing-account path computationally similar.
 const DUMMY_HASH = "$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxDA3sHBeTwSu31j/nbxWJg.m2O";
@@ -18,7 +19,7 @@ export async function login(formData: FormData) {
 
   const user = await prisma.user.findUnique({ where: { email } });
   const matches = await bcrypt.compare(password, user?.passwordHash ?? DUMMY_HASH);
-  if (!user || !matches) redirect("/entrar?erro=credenciais");
+  if (!user || !matches || !homologationAllowsOwner(user.id)) redirect("/entrar?erro=credenciais");
 
   // Rotate an existing session rather than reusing an attacker-supplied token.
   await destroySession();

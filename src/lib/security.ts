@@ -1,9 +1,19 @@
 import { createHash } from "node:crypto";
 import { headers } from "next/headers";
 import { prisma } from "./db";
+import { homologationAccess } from "./homologation";
+
+export async function assertHomologationPerimeter(): Promise<void> {
+  // Avoid accessing request headers when the normal mode is in use.
+  const initial = homologationAccess(null);
+  if (initial === "disabled") return;
+  const access = homologationAccess((await headers()).get("authorization"));
+  if (access !== "allowed") throw new Error("Acesso de homologação negado");
+}
 
 /** Check the browser Origin against a configured trusted origin, never Host. */
 export async function assertSameOrigin(): Promise<void> {
+  await assertHomologationPerimeter();
   const rawOrigin = (await headers()).get("origin");
   const configured = process.env.APP_URL ?? (process.env.NODE_ENV === "production" ? "" : "http://127.0.0.1:3000");
   if (!rawOrigin || !configured) throw new Error("Origem não permitida");

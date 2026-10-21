@@ -7,4 +7,10 @@ coverage/
 .npm-cache/
 .tmp/
 .local-media/
-/public/images/noivara-casal.webp
+
+# Backups must not be included in Git or a source-based deployment.
+backups/
+*.bak
+*.backup
+*.dump
+*.sql.gz

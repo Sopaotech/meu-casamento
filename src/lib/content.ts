@@ -81,6 +81,18 @@ export function contentFromForm(form: FormData): ValidationResult {
   ), templateVersion: 1, photoIds: form.getAll('photoIds') });
 }
 
+/** New forms collect both names separately; old submissions keep using coupleNames. */
+export function coupleNamesFromForm(form: FormData): string | null {
+  const first = form.get('firstName');
+  const second = form.get('secondName');
+  if (first === null && second === null) {
+    const legacy = form.get('coupleNames');
+    return typeof legacy === 'string' ? legacy : null;
+  }
+  if (typeof first !== 'string' || typeof second !== 'string' || !first.trim() || !second.trim()) return null;
+  return `${first.trim()} e ${second.trim()}`;
+}
+
 const reservedSlugs = new Set(['admin', 'api', 'login', 'logout', 'cadastro', 'painel', 'novo', 's', 'www']);
 
 export function normalizeSlug(value: unknown): string | null {

@@ -1,15 +1,18 @@
 import Link from "next/link";
 import { signup } from "./actions";
+import { redirect } from "next/navigation";
+import { homologationDeclared } from "@/lib/homologation";
 
 export const dynamic = "force-dynamic";
 
 export default async function CadastroPage({ searchParams }: { searchParams: Promise<{ erro?: string }> }) {
+  if (homologationDeclared()) redirect("/entrar");
   const { erro } = await searchParams;
   const errorMessage = erro === "limite" ? "Muitas tentativas. Aguarde 15 minutos e tente novamente." : erro === "dados" ? "Confira seus dados. A senha deve ter entre 12 e 72 bytes." : "Não foi possível criar a conta. Confira os dados ou entre na sua conta.";
   return (
     <main className="narrow" style={{ paddingBlock: "3rem" }}>
       <div className="card stack">
-        <Link href="/" className="brand">Noivara</Link>
+        <Link href="/" className="brand">Meu Casamento</Link>
         <h1>Criar conta</h1>
         <p>Comece a organizar o site do seu casamento.</p>
         {erro && <p role="alert" className="error">{errorMessage}</p>}

@@ -33,6 +33,7 @@ export default async function Editor({ params, searchParams }: {
     <Link href="/painel">← Voltar ao painel</Link>
     <div><p className="text-muted">Editor do site</p><h1>{content.coupleNames}</h1>
       <p>Endereço: /s/{wedding.slug} · {wedding.publishedRevisionId ? 'Publicado' : 'Não publicado'}</p></div>
+    <div><Link className="button button-secondary" href={`/painel/${encodeURIComponent(id)}/presentes`}>Lista de presentes</Link>{' '}<Link className="button button-secondary" href={`/painel/${encodeURIComponent(id)}/recebimentos`}>Presentes e recebimentos</Link></div>
     {estado && messages[estado] && <p className={['invalido', 'conflito', 'erro'].includes(estado) ? 'error' : 'notice'} role="status">{messages[estado]}</p>}
     <EditorForm key={`${id}:${wedding.draftVersion}:${wedding.publishedRevisionId ?? ''}`} id={id} version={wedding.draftVersion} initial={content} slug={wedding.slug} published={Boolean(wedding.publishedRevisionId)} />
   </main>;

@@ -4,6 +4,7 @@ import sharp from 'sharp';
 import { prisma as db } from '@/lib/db';
 import { validateContent } from '@/lib/content';
 import { photoStorage } from '@/lib/photo-storage';
+import { homologationAllowsOwner } from '@/lib/homologation';
 
 export const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
 export const MAX_PHOTO_PIXELS = 20_000_000;
@@ -128,7 +129,7 @@ export async function accessiblePhoto(id: string, userId: string | null) {
     storageKey: true, mimeType: true, weddingId: true,
     wedding: { select: { ownerId: true, publishedRevision: { select: { weddingId: true, content: true } } } },
   } });
-  if (!photo) return null;
+  if (!photo || !homologationAllowsOwner(photo.wedding.ownerId)) return null;
   if (!userId || photo.wedding.ownerId !== userId) {
     const revision = photo.wedding.publishedRevision;
     if (!revision || revision.weddingId !== photo.weddingId) return null;

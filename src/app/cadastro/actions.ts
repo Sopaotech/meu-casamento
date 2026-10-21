@@ -1,12 +1,14 @@
 "use server";
 
 import bcrypt from "bcryptjs";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { createSession, destroySession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { assertSameOrigin, consumeAuthAttempt, normalizeEmail, validPassword } from "@/lib/security";
+import { homologationDeclared } from "@/lib/homologation";
 
 export async function signup(formData: FormData) {
+  if (homologationDeclared()) notFound();
   await assertSameOrigin();
   const email = normalizeEmail(formData.get("email"));
   const password = formData.get("password");
