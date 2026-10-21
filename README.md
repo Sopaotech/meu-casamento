@@ -1,10 +1,10 @@
-# Wedding SaaS — primeira vertical
+# Meu Casamento — aplicação em desenvolvimento
 
-Aplicação em desenvolvimento local para cadastro, criação de um casamento, edição de texto, escolha de template, prévia privada e publicação. A solicitação atual autoriza o início do software; os documentos de G0/G1 existentes são históricos e permanecem intactos. Nenhum gate comercial ou financeiro foi aprovado por esta implementação.
+Aplicação em desenvolvimento para cadastro, criação de um casamento, edição de conteúdo, escolha de template, prévia privada, publicação e lista de presentes simbólicos. O domínio registrado é `meucasamento.ia.br`; a demonstração proposta em `demo.meucasamento.ia.br` ainda não foi publicada. Os documentos de G0/G1 são históricos. Nenhuma operação financeira foi aprovada ou ativada.
 
 ## Situação
 
-Este projeto é uma primeira implementação em andamento, **não está homologado nem pronto para produção**. Não use dados reais até validar o fluxo e os controles de segurança. Não há cobrança, presentes, RSVP, deploy ou integração financeira. Ainda não oferece verificação de e-mail, recuperação de senha, convites, múltiplos membros, RLS, auditoria, histórico acessível, nem política de retenção/exclusão. O criador é o único proprietário de cada casamento. As decisões comerciais, jurídicas e operacionais permanecem pendentes.
+Este projeto é uma implementação em andamento, **não está homologado nem pronto para produção**. Não use dados reais até validar o fluxo e os controles de segurança. Há um catálogo de presentes simbólicos e um painel financeiro demonstrativo com dados fictícios; não há cobrança, RSVP, deploy ou integração financeira real. Os pacotes de 6 e 12 meses estão em estudo, sem preços ou condições definidos. Ainda não oferece verificação de e-mail, recuperação de senha, convites, múltiplos membros, RLS, histórico acessível completo nem política de retenção/exclusão. O criador é o único proprietário de cada casamento. As decisões comerciais, jurídicas e operacionais permanecem pendentes.
 
 O código registra uma versão do template em cada publicação; futuras alterações do renderizador devem preservar o comportamento das versões já publicadas. A aplicação cria snapshots sem rota de edição e protege o vínculo da revisão ativa ao casamento, mas um usuário com privilégios diretos de escrita no banco ainda poderia alterar as revisões. Não há garantia de imutabilidade física nem de idempotência contra publicações duplicadas.
 
@@ -32,7 +32,7 @@ O modo `npm start` configura cookies seguros e exige uma `APP_URL` HTTPS; portan
 
 Execute `npm run typecheck`, `npm test` e `npm run build`. Os testes de integração com PostgreSQL ficam desativados por padrão e exigem um banco **separado e descartável** com nome terminado em `_test`, já preparado com as mesmas migrações. No PowerShell, defina `TEST_DATABASE_URL` com a URL desse banco e `RUN_DATABASE_TESTS=1`, então execute `npm test`. Os testes removem apenas os registros que criam, mas o banco precisa ser exclusivo para testes. Não aponte para um banco com dados reais.
 
-Os resultados e limitações da missão atual estão em `docs/PROJECT-STATUS.md`. Refaça a integração em PostgreSQL isolado e complemente com verificações de autenticação e acesso de uma segunda conta pela interface antes de homologar.
+Os resultados e limitações das missões estão em `docs/PROJECT-STATUS.md`. Na C-011D, os seis testes de integração passaram em PostgreSQL descartável e isolado. Antes da homologação, complemente a validação de autenticação e acesso entre contas em ambiente isolado apropriado e verifique o comportamento na infraestrutura destinada à demonstração.
 
 ## Organização
 
