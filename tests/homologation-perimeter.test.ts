@@ -3,6 +3,10 @@ import { NextRequest } from 'next/server';
 import { unstable_doesMiddlewareMatch } from 'next/experimental/testing/server';
 
 vi.mock('server-only', () => ({}));
+vi.mock('@/lib/homologation-rate-limit', () => ({
+  limitHomologationBasic: vi.fn(() => ({ state: 'ok' })),
+}));
+import { limitHomologationBasic } from '@/lib/homologation-rate-limit';
 import * as proxyModule from '../src/proxy';
 const { proxy } = proxyModule;
 
@@ -20,7 +24,10 @@ function enable() {
 }
 
 describe('perímetro de homologação', () => {
-  beforeEach(() => env.forEach(name => vi.stubEnv(name, '')));
+  beforeEach(() => {
+    env.forEach(name => vi.stubEnv(name, ''));
+    vi.mocked(limitHomologationBasic).mockReset().mockReturnValue({ state: 'ok' });
+  });
   afterEach(() => vi.unstubAllEnvs());
 
   it('preserva o comportamento normal quando o modo e suas configurações estão ausentes', () => {
@@ -41,6 +48,7 @@ describe('perímetro de homologação', () => {
     expect(response.status).toBe(401);
     expect(response.headers.get('www-authenticate')).toBe('Basic realm="Meu Casamento homologacao", charset="UTF-8"');
     expect(response.headers.get('cache-control')).toContain('no-store');
+    expect(limitHomologationBasic).not.toHaveBeenCalled();
   });
 
   it('não aceita senha errada, cabeçalhos internos falsificados ou POST direto', () => {
@@ -53,6 +61,7 @@ describe('perímetro de homologação', () => {
       },
     });
     expect(proxy(request).status).toBe(401);
+    expect(limitHomologationBasic).toHaveBeenCalledWith(true);
   });
 
   it('permite o acesso com credenciais corretas e impede cache compartilhado', () => {
@@ -61,6 +70,41 @@ describe('perímetro de homologação', () => {
     expect(response.headers.get('x-middleware-next')).toBe('1');
     expect(response.headers.get('cache-control')).toContain('no-store');
     expect(response.headers.get('vary')).toContain('Authorization');
+    expect(limitHomologationBasic).toHaveBeenCalledWith(false);
+  });
+
+  it('desativa o otimizador de imagens na homologação para evitar cache público', () => {
+    enable();
+    const response = proxy(new NextRequest('https://example.onrender.com/_next/image?url=%2Ficon.svg&w=640&q=75', {
+      headers: { authorization: basic },
+    }));
+    expect(response.status).toBe(404);
+    expect(response.headers.get('cache-control')).toContain('no-store');
+    expect(limitHomologationBasic).toHaveBeenCalledWith(false);
+  });
+
+  it('aplica o mesmo bloqueio a credenciais corretas e incorretas em qualquer host e asset', () => {
+    enable();
+    vi.mocked(limitHomologationBasic).mockReturnValue({ state: 'blocked', retryAfterSeconds: 42 });
+    for (const [url, authorization] of [
+      ['https://demo.example.test/fotos/id', basic],
+      ['https://example.onrender.com/_next/static/chunks/main.js', 'Basic Zm9yZ2Vk'],
+      ['https://other.example.test/entrar', basic],
+    ]) {
+      const response = proxy(new NextRequest(url, { headers: { authorization, 'x-forwarded-for': '127.0.0.1' } }));
+      expect(response.status).toBe(429);
+      expect(response.headers.get('retry-after')).toBe('42');
+      expect(response.headers.get('cache-control')).toContain('no-store');
+    }
+  });
+
+  it('falha fechado sem expor credenciais quando o armazenamento do limite está indisponível', async () => {
+    enable();
+    vi.mocked(limitHomologationBasic).mockReturnValue({ state: 'unavailable' });
+    const response = proxy(new NextRequest('https://example.onrender.com/painel', { headers: { authorization: basic } }));
+    expect(response.status).toBe(503);
+    expect(await response.text()).not.toContain(secret);
+    expect([...response.headers.values()].join(' ')).not.toContain(basic);
   });
 
   it('falha fechado para switch ausente com configuração parcial, switch inválido e segredos incompletos', () => {
