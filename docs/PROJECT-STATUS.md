@@ -2,6 +2,12 @@
 
 Registro iniciado na missão C-004B em 19/10/2026. Cada seção descreve o estado e os resultados no momento da respectiva missão; consulte a seção mais recente para decisões e etapas posteriores.
 
+## Estado e roadmap — C-013B.2B
+
+- O perímetro de homologação utiliza dois pares Basic independentes, com identificadores secretos aleatórios e limites persistentes separados. Identificadores desconhecidos não consomem os limites; um identificador vazado ainda permite bloquear seu próprio acesso, e tráfego volumoso ou falha do armazenamento pode afetar ambos. A configuração, as limitações e o roteiro estão em [C013B2B-PUBLICACAO.md](C013B2B-PUBLICACAO.md).
+- Passaram 118 testes direcionados e o typecheck no Windows com Node 24.21.0; um teste POSIX foi ignorado nesse ambiente. Uma verificação isolada em Linux com Node 24.22.1 confirmou permissões, separação dos limites e persistência. Ainda é necessário validar todos os caminhos e hosts no provedor real.
+- Push, criação de serviços pagos, deploy, migrations, bootstrap e DNS permanecem sujeitos às respectivas verificações e autorizações. O trabalho mantém a demonstração restrita e não acrescenta funcionalidades comerciais.
+
 ## Estado e roadmap — C-013B.1, em andamento
 
 - O trabalho da C-013B.1 está na branch `c013b1-seguranca-linux`, criada a partir de `master` para preservar o checkpoint `333ba70eb15d7ace6f960322e3aece39fd255852` e os documentos pendentes da C-013A. Os arquivos e resultados de validação foram conferidos, e as alterações estão preparadas no índice. O commit depende de autorização do responsável; nada foi publicado.

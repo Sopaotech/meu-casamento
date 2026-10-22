@@ -1,5 +1,7 @@
 # C-013B.1 — segurança e preparação Linux
 
+> Registro histórico da C-013B.1. Para a alteração posterior do limite e os requisitos atuais dos dois acessos, consulte [C013B2B-PUBLICACAO.md](C013B2B-PUBLICACAO.md); esta descrição da versão anterior não deve ser usada isoladamente para um novo deploy.
+
 Plano de trabalho em andamento para a demonstração restrita do Meu Casamento. A branch `c013b1-seguranca-linux` parte do commit `333ba70eb15d7ace6f960322e3aece39fd255852` e preserva os documentos pendentes da C-013A. Não houve contratação, provisionamento, deploy, alteração de DNS, acesso a banco persistente ou execução de migrations nesta missão. Nenhum commit ou push está autorizado por este documento.
 
 ## Perímetro e limite de tentativas

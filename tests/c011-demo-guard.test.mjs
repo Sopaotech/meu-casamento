@@ -11,7 +11,8 @@ const settings = {
   NOIVARA_HOMOLOG_DATABASE_NAME: databaseName,
   NOIVARA_HOMOLOG_CONTA_ID: `c011_${'a'.repeat(32)}`,
   NOIVARA_HOMOLOG_CONTA_SENHA: 'b'.repeat(32),
-  NOIVARA_HOMOLOG_USUARIO: 'demo', NOIVARA_HOMOLOG_SENHA: 'c'.repeat(32),
+  NOIVARA_HOMOLOG_USUARIO: 'a'.repeat(32), NOIVARA_HOMOLOG_SENHA: 'c'.repeat(32),
+  NOIVARA_HOMOLOG_USUARIO_2: 'd'.repeat(32), NOIVARA_HOMOLOG_SENHA_2: 'e'.repeat(32),
   APP_URL: 'https://example.onrender.com',
   DATABASE_URL: `postgresql://demo_user:example-password@dpg-example-a/${databaseName}?schema=public&sslmode=require`,
 };
@@ -68,10 +69,39 @@ describe('guarda da preparação C-011, sem conectar a um banco', () => {
     { DATABASE_URL: `postgresql://demo:pass@dpg-example-a/${databaseName}?sslmode=prefer` },
     { DATABASE_URL: `postgresql://demo:pass@dpg-example-a/${databaseName}?schema=public` },
     { APP_URL: 'http://example.onrender.com' }, { NOIVARA_HOMOLOG_CONTA_ID: 'outro_usuario' },
-    { NOIVARA_HOMOLOG_CONTA_SENHA: 'curta' }, { NOIVARA_HOMOLOG_CONTA_SENHA: 'c'.repeat(32) },
-    { NOIVARA_HOMOLOG_SENHA: undefined },
+    { NOIVARA_HOMOLOG_CONTA_SENHA: 'curta' },
   ])('rejeita configurações incompletas ou destinos inadequados', (change) => {
     expect(() => validateSettings({ ...settings, ...change }, confirmation)).toThrow();
+  });
+
+  it.each([
+    { NOIVARA_HOMOLOG_USUARIO: undefined }, { NOIVARA_HOMOLOG_USUARIO_2: undefined },
+    { NOIVARA_HOMOLOG_SENHA: undefined }, { NOIVARA_HOMOLOG_SENHA_2: undefined },
+    { NOIVARA_HOMOLOG_USUARIO: 'a'.repeat(31) }, { NOIVARA_HOMOLOG_USUARIO_2: 'd'.repeat(33) },
+    { NOIVARA_HOMOLOG_USUARIO: 'g'.repeat(32) }, { NOIVARA_HOMOLOG_USUARIO_2: 'D'.repeat(32) },
+    { NOIVARA_HOMOLOG_USUARIO: 'a'.repeat(32) + '\n' }, { NOIVARA_HOMOLOG_USUARIO_2: 'd'.repeat(31) + '\n' },
+    { NOIVARA_HOMOLOG_USUARIO_2: 'a'.repeat(32) },
+    { NOIVARA_HOMOLOG_SENHA: 'c'.repeat(31) }, { NOIVARA_HOMOLOG_SENHA_2: 'e'.repeat(129) },
+    { NOIVARA_HOMOLOG_SENHA: 'c'.repeat(31) + ' ' }, { NOIVARA_HOMOLOG_SENHA_2: 'e'.repeat(32) + '\n' },
+    { NOIVARA_HOMOLOG_CONTA_SENHA: 'b'.repeat(32) + '\n' },
+    { NOIVARA_HOMOLOG_CONTA_SENHA: 'c'.repeat(32) }, { NOIVARA_HOMOLOG_CONTA_SENHA: 'e'.repeat(32) },
+    { NOIVARA_HOMOLOG_SENHA_2: 'c'.repeat(32) },
+  ])('recusa credenciais de perímetro parciais, inválidas ou repetidas', (change) => {
+    expect(() => validateSettings({ ...settings, ...change }, confirmation)).toThrow();
+  });
+
+  it('aceita os tamanhos máximos de senha sem expor as credenciais de perímetro no resultado', () => {
+    const changes = {
+      NOIVARA_HOMOLOG_CONTA_SENHA: 'b'.repeat(72),
+      NOIVARA_HOMOLOG_SENHA: 'c'.repeat(128),
+      NOIVARA_HOMOLOG_SENHA_2: 'e'.repeat(128),
+    };
+    const result = validateSettings({ ...settings, ...changes }, confirmation);
+    expect(result.accountPassword).toBe(changes.NOIVARA_HOMOLOG_CONTA_SENHA);
+    for (const secret of [settings.NOIVARA_HOMOLOG_USUARIO, settings.NOIVARA_HOMOLOG_USUARIO_2,
+      changes.NOIVARA_HOMOLOG_SENHA, changes.NOIVARA_HOMOLOG_SENHA_2]) {
+      expect(Object.values(result)).not.toContain(secret);
+    }
   });
 
   it('exige confirmação explícita e não aceita argumentos adicionais', () => {

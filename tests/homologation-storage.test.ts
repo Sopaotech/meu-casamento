@@ -10,8 +10,10 @@ describe('configuração de mídia da homologação', () => {
     vi.stubEnv('NODE_ENV', 'test');
     vi.stubEnv('APP_URL', 'http://127.0.0.1:3000');
     vi.stubEnv('NOIVARA_HOMOLOGACAO', '1');
-    vi.stubEnv('NOIVARA_HOMOLOG_USUARIO', 'viewer');
+    vi.stubEnv('NOIVARA_HOMOLOG_USUARIO', 'a'.repeat(32));
     vi.stubEnv('NOIVARA_HOMOLOG_SENHA', 'SYNTHETIC-test-password-0123456789');
+    vi.stubEnv('NOIVARA_HOMOLOG_USUARIO_2', 'b'.repeat(32));
+    vi.stubEnv('NOIVARA_HOMOLOG_SENHA_2', 'SYNTHETIC-second-password-987654321');
     vi.stubEnv('NOIVARA_HOMOLOG_CONTA_ID', 'demo_account');
   });
   afterEach(() => vi.unstubAllEnvs());

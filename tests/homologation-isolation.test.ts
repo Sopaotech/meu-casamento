@@ -19,14 +19,16 @@ import { publicPage } from '../src/lib/weddings';
 import { getUser } from '../src/lib/auth';
 
 const secret = 'SYNTHETIC-test-password-0123456789';
-const basic = `Basic ${Buffer.from(`viewer:${secret}`).toString('base64')}`;
+const basic = `Basic ${Buffer.from(`${'a'.repeat(32)}:${secret}`).toString('base64')}`;
 const id = 'a'.repeat(64);
 function configure() {
   vi.stubEnv('NODE_ENV', 'test');
   vi.stubEnv('APP_URL', 'http://127.0.0.1:3000');
   vi.stubEnv('NOIVARA_HOMOLOGACAO', '1');
-  vi.stubEnv('NOIVARA_HOMOLOG_USUARIO', 'viewer');
+  vi.stubEnv('NOIVARA_HOMOLOG_USUARIO', 'a'.repeat(32));
   vi.stubEnv('NOIVARA_HOMOLOG_SENHA', secret);
+  vi.stubEnv('NOIVARA_HOMOLOG_USUARIO_2', 'b'.repeat(32));
+  vi.stubEnv('NOIVARA_HOMOLOG_SENHA_2', 'SYNTHETIC-second-password-987654321');
   vi.stubEnv('NOIVARA_HOMOLOG_CONTA_ID', 'demo_account');
 }
 

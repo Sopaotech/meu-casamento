@@ -14,7 +14,7 @@ import EntrarPage from '../src/app/entrar/page';
 const props = { searchParams: Promise.resolve({}) };
 const configNames = [
   'NOIVARA_HOMOLOGACAO', 'NOIVARA_HOMOLOG_USUARIO',
-  'NOIVARA_HOMOLOG_SENHA', 'NOIVARA_HOMOLOG_CONTA_ID', 'APP_URL',
+  'NOIVARA_HOMOLOG_SENHA', 'NOIVARA_HOMOLOG_USUARIO_2', 'NOIVARA_HOMOLOG_SENHA_2', 'NOIVARA_HOMOLOG_CONTA_ID', 'APP_URL',
 ];
 
 describe('navegação de cadastro e entrada', () => {
@@ -37,8 +37,10 @@ describe('navegação de cadastro e entrada', () => {
 
   it('direciona cadastro para entrada e oculta o link na homologação', async () => {
     vi.stubEnv('NOIVARA_HOMOLOGACAO', '1');
-    vi.stubEnv('NOIVARA_HOMOLOG_USUARIO', 'viewer');
+    vi.stubEnv('NOIVARA_HOMOLOG_USUARIO', 'a'.repeat(32));
     vi.stubEnv('NOIVARA_HOMOLOG_SENHA', 'synthetic-test-password-0123456789');
+    vi.stubEnv('NOIVARA_HOMOLOG_USUARIO_2', 'b'.repeat(32));
+    vi.stubEnv('NOIVARA_HOMOLOG_SENHA_2', 'synthetic-second-password-987654321');
     vi.stubEnv('NOIVARA_HOMOLOG_CONTA_ID', 'demo_account');
     vi.stubEnv('APP_URL', 'http://127.0.0.1:3000');
     await expect(CadastroPage(props)).rejects.toThrow('REDIRECT:/entrar');

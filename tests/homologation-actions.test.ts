@@ -15,13 +15,15 @@ import { signup } from '../src/app/cadastro/actions';
 import { createWeddingAction } from '../src/app/painel/actions';
 
 const secret = 'SYNTHETIC-test-password-0123456789';
-const basic = `Basic ${Buffer.from(`viewer:${secret}`).toString('base64')}`;
+const basic = `Basic ${Buffer.from(`${'a'.repeat(32)}:${secret}`).toString('base64')}`;
 function configure() {
   vi.stubEnv('NODE_ENV', 'test');
   vi.stubEnv('APP_URL', 'http://127.0.0.1:3000');
   vi.stubEnv('NOIVARA_HOMOLOGACAO', '1');
-  vi.stubEnv('NOIVARA_HOMOLOG_USUARIO', 'viewer');
+  vi.stubEnv('NOIVARA_HOMOLOG_USUARIO', 'a'.repeat(32));
   vi.stubEnv('NOIVARA_HOMOLOG_SENHA', secret);
+  vi.stubEnv('NOIVARA_HOMOLOG_USUARIO_2', 'b'.repeat(32));
+  vi.stubEnv('NOIVARA_HOMOLOG_SENHA_2', 'SYNTHETIC-second-password-987654321');
   vi.stubEnv('NOIVARA_HOMOLOG_CONTA_ID', 'demo_account');
 }
 
@@ -43,7 +45,7 @@ describe('ações diretas na homologação', () => {
   });
 
   it('mantém o caminho de cadastro normal com o modo e parâmetros ausentes', async () => {
-    for (const name of ['NOIVARA_HOMOLOGACAO', 'NOIVARA_HOMOLOG_USUARIO', 'NOIVARA_HOMOLOG_SENHA', 'NOIVARA_HOMOLOG_CONTA_ID']) vi.stubEnv(name, '');
+    for (const name of ['NOIVARA_HOMOLOGACAO', 'NOIVARA_HOMOLOG_USUARIO', 'NOIVARA_HOMOLOG_SENHA', 'NOIVARA_HOMOLOG_USUARIO_2', 'NOIVARA_HOMOLOG_SENHA_2', 'NOIVARA_HOMOLOG_CONTA_ID']) vi.stubEnv(name, '');
     mocks.headers.mockResolvedValue(new Headers({ origin: 'http://127.0.0.1:3000' }));
     await expect(signup(new FormData())).rejects.toThrow('REDIRECT:/cadastro?erro=dados');
     expect(mocks.create).not.toHaveBeenCalled();

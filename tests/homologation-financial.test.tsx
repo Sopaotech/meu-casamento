@@ -12,14 +12,16 @@ import HomologationFinancialDemo from '../src/app/painel/[id]/recebimentos/demon
 import ReceiptsPage from '../src/app/painel/[id]/recebimentos/page';
 
 const secret = 'SYNTHETIC-test-password-0123456789';
-const basic = `Basic ${Buffer.from(`viewer:${secret}`).toString('base64')}`;
+const basic = `Basic ${Buffer.from(`${'a'.repeat(32)}:${secret}`).toString('base64')}`;
 const params = Promise.resolve({ id: 'wedding' });
 function configure() {
   vi.stubEnv('NODE_ENV', 'test');
   vi.stubEnv('APP_URL', 'http://127.0.0.1:3000');
   vi.stubEnv('NOIVARA_HOMOLOGACAO', '1');
-  vi.stubEnv('NOIVARA_HOMOLOG_USUARIO', 'viewer');
+  vi.stubEnv('NOIVARA_HOMOLOG_USUARIO', 'a'.repeat(32));
   vi.stubEnv('NOIVARA_HOMOLOG_SENHA', secret);
+  vi.stubEnv('NOIVARA_HOMOLOG_USUARIO_2', 'b'.repeat(32));
+  vi.stubEnv('NOIVARA_HOMOLOG_SENHA_2', 'SYNTHETIC-second-password-987654321');
   vi.stubEnv('NOIVARA_HOMOLOG_CONTA_ID', 'demo_account');
 }
 
@@ -62,7 +64,7 @@ describe('exemplo financeiro isolado', () => {
   });
 
   it('desativa a página e o link quando o modo está ausente ou incompleto', async () => {
-    for (const name of ['NOIVARA_HOMOLOGACAO', 'NOIVARA_HOMOLOG_USUARIO', 'NOIVARA_HOMOLOG_SENHA', 'NOIVARA_HOMOLOG_CONTA_ID']) vi.stubEnv(name, '');
+    for (const name of ['NOIVARA_HOMOLOGACAO', 'NOIVARA_HOMOLOG_USUARIO', 'NOIVARA_HOMOLOG_SENHA', 'NOIVARA_HOMOLOG_USUARIO_2', 'NOIVARA_HOMOLOG_SENHA_2', 'NOIVARA_HOMOLOG_CONTA_ID']) vi.stubEnv(name, '');
     await expect(HomologationFinancialDemo({ params })).rejects.toThrow('NOT_FOUND');
     expect(renderToStaticMarkup(await ReceiptsPage({ params }))).not.toContain('/recebimentos/demonstracao');
     configure();

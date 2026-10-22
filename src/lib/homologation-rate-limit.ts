@@ -14,13 +14,13 @@ const WINDOW_MS = 15 * 60 * 1000;
 const MAX_FAILURES = 8;
 const BUSY_TIMEOUT_MS = 250;
 const APPLICATION_ID = 0x4e56524c;
-const VERSION = 1;
-const BASE_NAME = '.noivara-homologation-basic-rate-v1';
+const VERSION = 2;
+const BASE_NAME = '.noivara-homologation-basic-rate-v2';
 const DATABASE_NAME = `${BASE_NAME}.sqlite`;
 const MARKER_NAME = `${BASE_NAME}.initialized`;
-const MARKER = 'noivara-homologation-basic-rate-limit-v1\n';
+const MARKER = 'noivara-homologation-basic-rate-limit-v2\n';
 const TABLE = 'noivara_basic_failures';
-const SCHEMA = `CREATE TABLE ${TABLE} (occurred_at_ms INTEGER NOT NULL CHECK (typeof(occurred_at_ms) = 'integer' AND occurred_at_ms >= 0)) STRICT`;
+const SCHEMA = `CREATE TABLE ${TABLE} (slot INTEGER NOT NULL CHECK (slot IN (0, 1)), occurred_at_ms INTEGER NOT NULL CHECK (typeof(occurred_at_ms) = 'integer' AND occurred_at_ms >= 0)) STRICT`;
 
 function inside(parent: string, child: string): boolean {
   const relative = path.relative(parent, child);
@@ -169,6 +169,11 @@ function verifySchema(db: DatabaseSync): void {
 
 function stateFile(): string {
   const directory = safeDirectory();
+  // Do not reset, migrate, or silently bypass any previous limiter state.
+  const legacy = path.join(directory, '.noivara-homologation-basic-rate-v1');
+  for (const suffix of ['.initialized', '.sqlite', '.sqlite-journal', '.sqlite-wal', '.sqlite-shm']) {
+    if (optionalStat(`${legacy}${suffix}`)) throw new Error();
+  }
   const marker = path.join(directory, MARKER_NAME);
   const database = path.join(directory, DATABASE_NAME);
   let markerStat = safeFile(marker);
@@ -195,15 +200,15 @@ function stateFile(): string {
 }
 
 /**
- * Global sliding window for the Basic perimeter. No credentials or request
- * headers reach this module. Persistent storage is required; there is no
+ * Two fixed, independent sliding windows. No credentials or request headers
+ * reach this module. Persistent storage is required; there is no
  * process-local fallback. Every error intentionally fails closed without logs.
  */
-export function limitHomologationBasic(denied: boolean): LimitResult {
+export function limitHomologationBasic(slot: 0 | 1, denied: boolean): LimitResult {
   let db: DatabaseSync | undefined;
   let transaction = false;
   try {
-    if (typeof denied !== 'boolean') throw new Error();
+    if ((slot !== 0 && slot !== 1) || typeof denied !== 'boolean') throw new Error();
     const filename = stateFile();
     db = new DatabaseSync(filename, { timeout: BUSY_TIMEOUT_MS });
     db.exec('BEGIN IMMEDIATE');
@@ -211,14 +216,14 @@ export function limitHomologationBasic(denied: boolean): LimitResult {
     verifySchema(db);
     const now = Date.now();
     if (!Number.isSafeInteger(now) || now < 0) throw new Error();
-    const rows = db.prepare(`SELECT occurred_at_ms FROM ${TABLE} ORDER BY occurred_at_ms LIMIT ?`).all(MAX_FAILURES + 1);
+    const rows = db.prepare(`SELECT occurred_at_ms FROM ${TABLE} WHERE slot = ? ORDER BY occurred_at_ms LIMIT ?`).all(slot, MAX_FAILURES + 1);
     if (rows.length > MAX_FAILURES) throw new Error();
     const timestamps = rows.map(row => row.occurred_at_ms);
     if (timestamps.some(value => typeof value !== 'number' || !Number.isSafeInteger(value) || value < 0)) throw new Error();
     const active = (timestamps as number[]).filter(value => value > now - WINDOW_MS);
     if (active.length < MAX_FAILURES && denied) {
-      db.prepare(`DELETE FROM ${TABLE} WHERE occurred_at_ms <= ?`).run(now - WINDOW_MS);
-      db.prepare(`INSERT INTO ${TABLE} (occurred_at_ms) VALUES (?)`).run(now);
+      db.prepare(`DELETE FROM ${TABLE} WHERE slot = ? AND occurred_at_ms <= ?`).run(slot, now - WINDOW_MS);
+      db.prepare(`INSERT INTO ${TABLE} (slot, occurred_at_ms) VALUES (?, ?)`).run(slot, now);
       active.push(now);
       active.sort((a, b) => a - b);
     }

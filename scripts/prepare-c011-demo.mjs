@@ -30,6 +30,9 @@ class GuardError extends Error {
   constructor() { super('Destino ou configuração da homologação não confirmado.'); }
 }
 const refuse = () => { throw new GuardError(); };
+const validPerimeterUser = (value) => typeof value === 'string' && value.length === 32 && !/[^a-f0-9]/.test(value);
+const validPassword = (value, maxLength) => typeof value === 'string' && value.length >= 32
+  && value.length <= maxLength && !/[^\x21-\x7e]/.test(value);
 
 /** These checks run before loading Prisma or opening any connection. */
 export function validateSettings(env, args) {
@@ -42,11 +45,17 @@ export function validateSettings(env, args) {
   const accountPassword = env.NOIVARA_HOMOLOG_CONTA_SENHA ?? '';
   const perimeterUser = env.NOIVARA_HOMOLOG_USUARIO ?? '';
   const perimeterPassword = env.NOIVARA_HOMOLOG_SENHA ?? '';
-  if (!/^c011_[a-f0-9]{32}$/.test(accountId)
-    || !/^[\x21-\x7e]{32,72}$/.test(accountPassword)
-    || !/^[A-Za-z0-9._-]{1,64}$/.test(perimeterUser)
-    || !/^[\x21-\x7e]{32,128}$/.test(perimeterPassword)
-    || accountPassword === perimeterPassword) refuse();
+  const secondPerimeterUser = env.NOIVARA_HOMOLOG_USUARIO_2 ?? '';
+  const secondPerimeterPassword = env.NOIVARA_HOMOLOG_SENHA_2 ?? '';
+  if (accountId.length !== 37 || !/^c011_[a-f0-9]{32}$/.test(accountId)
+    || !validPassword(accountPassword, 72)
+    || !validPerimeterUser(perimeterUser)
+    || !validPerimeterUser(secondPerimeterUser)
+    || perimeterUser === secondPerimeterUser
+    || !validPassword(perimeterPassword, 128)
+    || !validPassword(secondPerimeterPassword, 128)
+    || accountPassword === perimeterPassword || accountPassword === secondPerimeterPassword
+    || perimeterPassword === secondPerimeterPassword) refuse();
 
   let origin;
   let url;

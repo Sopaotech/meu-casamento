@@ -10,6 +10,7 @@ coverage/
 
 # Operational state of the homologation access limiter must remain private.
 **/.noivara-homologation-basic-rate-v1.*
+**/.noivara-homologation-basic-rate-v2.*
 
 # Backups must not be included in Git or a source-based deployment.
 backups/
