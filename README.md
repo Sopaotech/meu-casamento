@@ -1,4 +1,4 @@
-# Meu Casamento — aplicação em desenvolvimento
+# Meu Casamento aplicação em desenvolvimento
 
 Aplicação em desenvolvimento para cadastro, criação de um casamento, edição de conteúdo, escolha de template, prévia privada, publicação e lista de presentes simbólicos. O domínio registrado é `meucasamento.ia.br`; a demonstração proposta em `demo.meucasamento.ia.br` ainda não foi publicada. Os documentos de G0/G1 são históricos. Nenhuma operação financeira foi aprovada ou ativada.
 
